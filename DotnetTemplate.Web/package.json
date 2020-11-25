@@ -1,0 +1,59 @@
+{
+  "version": "1.0.0",
+  "name": "dotnet-template",
+  "private": true,
+  "scripts": {
+    "prebuild": "npm run clean",
+    "build": "run-p build:*",
+    "build:sass": "npm run sass -- --output-style compressed",
+    "build:webpack": "webpack",
+    "lint": "eslint ./Scripts/**/*.ts",
+    "lint-fix": "eslint --fix ./Scripts/**/*.ts",
+    "dev": "run-p dev:*",
+    "dev:sass": "npm run sass && npm run sass -- --watch",
+    "dev:webpack": "webpack --config webpack.config.dev.js",
+    "clean": "rimraf wwwroot/css/ && rimraf wwwroot/js/",
+    "sass": "node-sass Styles/ --importer node_modules/node-sass-package-importer/dist/cli.js --output wwwroot/css/",
+    "test": "jasmine-ts --config=Scripts/spec/support/jasmine.json"
+  },
+  "dependencies": {
+    "core-js": "^3.6.5",
+    "nhsuk-frontend": "3.1.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.11.1",
+    "@babel/preset-env": "^7.11.0",
+    "@babel/preset-typescript": "^7.10.4",
+    "@types/jasmine": "^3.5.11",
+    "@typescript-eslint/eslint-plugin": "^3.7.0",
+    "@typescript-eslint/parser": "^3.7.0",
+    "babel-loader": "^8.1.0",
+    "copy-webpack-plugin": "^6.0.3",
+    "eslint": "^7.5.0",
+    "eslint-config-airbnb-base": "^14.2.0",
+    "eslint-import-resolver-webpack": "^0.12.2",
+    "eslint-plugin-import": "^2.22.0",
+    "eslint-plugin-jasmine": "^4.1.1",
+    "fork-ts-checker-webpack-plugin": "^5.0.14",
+    "glob": "7.0.4",
+    "jasmine": "^3.6.1",
+    "jasmine-parameterized": "^0.4.0",
+    "jasmine-ts": "^0.3.0",
+    "jsdom": "^16.3.0",
+    "node-sass": "4.14.1",
+    "node-sass-package-importer": "5.3.2",
+    "npm-run-all": "4.1.5",
+    "rimraf": "3.0.2",
+    "source-map-loader": "0.2.4",
+    "ts-loader": "7.0.4",
+    "ts-node": "^8.10.2",
+    "typescript": "3.9.2",
+    "webpack": "4.43.0",
+    "webpack-cli": "3.3.11"
+  },
+  "-vs-binding": {
+    "ProjectOpened": [
+      "dev"
+    ]
+  }
+}
