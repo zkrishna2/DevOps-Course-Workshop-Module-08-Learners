@@ -5,6 +5,9 @@
 ### Add dockerfile
 Add a dockerfile to the app so that you can build and run it using Docker.
 
+Hints:
+- If you are seeing a Node Sass error, try adding the `DotnetTemplate.Web/node_modules` folder to a `.dockerignore` file to avoid copying build artefacts/dependencies into the image.
+
 ### Publish manually to Docker Hub
 1. Create a personal free account on [Docker Hub](https://hub.docker.com/).
 2. Create a public repository in Docker Hub: https://hub.docker.com/repository/create. Don't connect it to GitHub and name it dotnettemplate.
@@ -32,10 +35,23 @@ In one of the workshop 7 goals you were asked to set up a Jenkins job for the ap
 
 ### Deploy to Heroku manually
 1. Create a free Heroku account: https://signup.heroku.com/.
-2. Create a new Heroku app: https://dashboard.heroku.com/new-app.
+2. Create a new Heroku app: https://dashboard.heroku.com/new-app. Do not click the button to integrate with a GitHub repository.
 3. Build your docker image locally and deploy it to Heroku. See https://devcenter.heroku.com/articles/container-registry-and-runtime for instructions. In particular you want to [push an existing image](https://devcenter.heroku.com/articles/container-registry-and-runtime#building-and-pushing-image-s) then [release the image](https://devcenter.heroku.com/articles/container-registry-and-runtime#cli). The first steps will push the docker image to Heroku's Docker Hub registry. Then the last step will deploy that image to your Heroku app.
 4. You should now see a log of the deployment on your Heroku app's dashboard: https://dashboard.heroku.com/apps/<HEROKU_APP_NAME> (replace <HEROKU_APP_NAME> with the name you gave your Heroku app when you created it).
 5. You can see the app running by clicking the "Open app" button on the app's dasboard, or by going to <HEROKU_APP_NAME>.herokuapp.com (replace <HEROKU_APP_NAME> with the name you gave your Heroku app when you created it).
+
+### Multistage Dockerfile
+If you haven't already, try writing your Dockerfile as a multistage build. 
+```
+FROM <parent-image-1> as build-stage
+# Some commands
+
+FROM <parent-image-2>
+# Some commands
+```
+In this way you can use a large image (containing the .NET SDK) to build the project and then use a smaller parent for your final image that will run the application. You can copy files from the earlier stage to the later one with a COPY command of the form: `COPY --from=build-stage ./source ./destination`.
+
+You should see a decrease in the image size from ~1.5GB to a few hundred MB. This will make uploads to Heroku a lot faster.
 
 ### Deploy to Heroku with GitHub Actions
 Add a new step to your workflow which will deploy to Heroku. You should be able to find an existing action to do this for you. As with the publish step, make sure this only runs on the main branch.
@@ -51,8 +67,11 @@ How would you handle failure, for example if the healthcheck in the previous ste
 ### (Stretch goal) Monitor for failure
 Failures don't always happen immediately after a deployment. Sometimes runtime issues will only emerge after minutes, hours or days in production. Set up a separate workflow which will use your healthcheck endpoint and send a notification if the healthcheck fails. Make sure this workflow runs every 5 minutes. Hint: https://docs.github.com/en/actions/reference/workflow-syntax-for-github-actions#onschedule.
 
+### (Stretch goal) Multiple environments
+Try making your workflow release to a different Heroku app environment for each branch of your repository.
+
+### (Stretch goal) Promote when manually triggered
+Currently we'll deploy every time a change is pushed to the main branch. However you might want to have more control over when deployments happen. Modify your Heroku and workflow setup so your main branch releases to a staging environment you instead manually trigger a workflow to release to production. 
+
 ### (Stretch goal) Jenkins
 In one of the workshop 7 goals you were asked to set up a Jenkins job for the app (if you haven't done that yet it's worth going back to it now). Now modify the Jenkinsfile so that it will deploy to Heroku.
-
-### (Stretch goal) Deploy only when manually triggered
-Currently we'll deploy every time a change is pushed to the main branch. However you might want to have more control over when deployments happen. Modify one or both of your CI pipelines to only deploy when manually told to do so.
