@@ -5,8 +5,12 @@
 ### Add dockerfile
 Add a dockerfile to the app so that you can build and run it using Docker.
 
-Hints:
+There are different approaches to writing the Dockerfile but we'd recommend starting from an [official dotnet image](https://hub.docker.com/_/microsoft-dotnet) and then [scripting the install of node/NPM](https://github.com/nodesource/distributions/blob/master/README.md).
+
+Troubleshooting:
 - If you are seeing a Node Sass error, try adding the `DotnetTemplate.Web/node_modules` folder to a `.dockerignore` file to avoid copying build artefacts/dependencies into the image.
+- To be able to build the dotnet code you'll need the SDK (Software Development Kit) version of the dotnet Docker image.
+- Note that you won't need to run `sudo` when building the image (as the default user is root).
 
 ### Publish manually to Docker Hub
 1. Create a personal free account on [Docker Hub](https://hub.docker.com/).
