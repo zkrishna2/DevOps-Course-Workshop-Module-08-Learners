@@ -3,14 +3,18 @@
 ## Part 1 (Publish to Docker Hub)
 
 ### Add dockerfile
-Add a dockerfile to the app so that you can build and run it using Docker.
+Add a Dockerfile to the app so that you can build and run it using Docker.
 
 There are different approaches to writing the Dockerfile but we'd recommend starting from an [official dotnet image](https://hub.docker.com/_/microsoft-dotnet) and then [scripting the install of node/NPM](https://github.com/nodesource/distributions/blob/master/README.md).
 
-Troubleshooting:
-- If you are seeing a Node Sass error, try adding the `DotnetTemplate.Web/node_modules` folder to a `.dockerignore` file to avoid copying build artefacts/dependencies into the image.
-- To be able to build the dotnet code you'll need the SDK (Software Development Kit) version of the dotnet Docker image.
-- Note that you won't need to run `sudo` when building the image (as the default user is root).
+Then use the setup commands in [during_workshop_7.md](./during_workshop_7.md) to install dependencies and build the app.
+
+And then add an `ENTRYPOINT` that will start the app.
+
+> Troubleshooting:
+> - If you are seeing a Node Sass error, try adding the `DotnetTemplate.Web/node_modules` folder to a `.dockerignore` file to avoid copying local build artefacts/dependencies into the image.
+> - To build the dotnet code you'll need the correct version of the [SDK](mcr.microsoft.com/dotnet/sdk:5.0) (Software Development Kit) dotnet Docker image.
+> - Note that you won't need to run `sudo` when building the image (as the default user is root).
 
 ### Publish manually to Docker Hub
 1. Create a personal free account on [Docker Hub](https://hub.docker.com/).
@@ -20,7 +24,7 @@ Troubleshooting:
 ### Publish to Docker Hub with GitHub Actions
 You should already have a GitHub Actions workflow file which will build and test the app. Now add a new step to it which will publish the app to Docker Hub. You should be able to find an existing action to do this for you.
 
-Publish the image with two tags: "latest" and also the git commit hash.
+Try publishing the image with the branch that triggered the build. You can use the `github` context to find out the commit. See [here](https://docs.github.com/en/actions/reference/context-and-expression-syntax-for-github-actions#contexts) for details. Note that default environment variables won't be available in a `with: ` section because that's evaluated during workflow processing before it is sent to the runnerr.
 
 ### Test your workflow
 To test that publishing to Docker Hub is working:
@@ -41,11 +45,13 @@ In one of the workshop 7 goals you were asked to set up a Jenkins job for the ap
 1. Create a free Heroku account: https://signup.heroku.com/.
 2. Create a new Heroku app: https://dashboard.heroku.com/new-app. Do not click the button to integrate with a GitHub repository.
 3. Build your docker image locally and deploy it to Heroku. See https://devcenter.heroku.com/articles/container-registry-and-runtime for instructions. In particular you want to [push an existing image](https://devcenter.heroku.com/articles/container-registry-and-runtime#building-and-pushing-image-s) then [release the image](https://devcenter.heroku.com/articles/container-registry-and-runtime#cli). The first steps will push the docker image to Heroku's Docker Hub registry. Then the last step will deploy that image to your Heroku app.
+> - The docs mention a "process-type". You want to use `web`
+> - If you are using `ENTRYPOINT dotnet run`, that will not work on Heroku because of how it runs containers. You can use the "exec" syntax instead: `ENTRYPOINT ["dotnet", "run"]`
 4. You should now see a log of the deployment on your Heroku app's dashboard: https://dashboard.heroku.com/apps/<HEROKU_APP_NAME> (replace <HEROKU_APP_NAME> with the name you gave your Heroku app when you created it).
 5. You can see the app running by clicking the "Open app" button on the app's dasboard, or by going to <HEROKU_APP_NAME>.herokuapp.com (replace <HEROKU_APP_NAME> with the name you gave your Heroku app when you created it).
 
 ### Multistage Dockerfile
-If you haven't already, try writing your Dockerfile as a multistage build. 
+If you haven't already, try writing your Dockerfile as [a multistage build](https://docs.docker.com/engine/examples/dotnetcore/#create-a-dockerfile-for-an-aspnet-core-application). For an example that more closely matches this project see [here](https://github.com/dotnet/dotnet-docker/blob/main/samples/aspnetapp/Dockerfile)
 ```
 FROM <parent-image-1> as build-stage
 # Some commands
@@ -53,7 +59,13 @@ FROM <parent-image-1> as build-stage
 FROM <parent-image-2>
 # Some commands
 ```
-In this way you can use a large image (containing the .NET SDK) to build the project and then use a smaller parent for your final image that will run the application. You can copy files from the earlier stage to the later one with a COPY command of the form: `COPY --from=build-stage ./source ./destination`.
+In this way you can use a large parent (`dotnet/sdk`) to build the app and then use a smaller parent (`dotnet/aspnet`) for your final image that will run the application. The second stage just needs to copy the build artefact from the earlier stage with a COPY command of the form: `COPY --from=build-stage ./source ./destination`.
+
+To make the example work:
+- Replace any mention of "aspnetapp" with "DotnetTemplate.Web". 
+- In addition to copying DotnetTemplate.Web/\*.csproj, you will need to copy DotnetTemplate.Web.Tests/\*.csproj
+- Remove the "--no-restore" option from the publish command
+- Keep your instructions that install node, but you no longer need the "npm ..." commands (they are included in DotnetTemplate.Web.csproj). 
 
 You should see a decrease in the image size from ~1.5GB to a few hundred MB. This will make uploads to Heroku a lot faster.
 
