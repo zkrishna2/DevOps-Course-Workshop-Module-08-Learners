@@ -24,7 +24,7 @@ And then add an `ENTRYPOINT` that will start the app.
 ### Publish to Docker Hub with GitHub Actions
 You should already have a GitHub Actions workflow file which will build and test the app. Now add a new step to it which will publish the app to Docker Hub. You should be able to find an existing action to do this for you.
 
-Try publishing the image with the branch that triggered the build. You can use the `github` context to find out the commit. See [here](https://docs.github.com/en/actions/reference/context-and-expression-syntax-for-github-actions#contexts) for details. Note that default environment variables won't be available in a `with: ` section because that's evaluated during workflow processing before it is sent to the runnerr.
+Try publishing the image with the branch that triggered the build. You can use the `github` context to find out the commit. See [here](https://docs.github.com/en/actions/reference/context-and-expression-syntax-for-github-actions#contexts) for details. Note that default environment variables won't be available in a `with: ` section because that's evaluated during workflow processing before it is sent to the runner.
 
 ### Test your workflow
 To test that publishing to Docker Hub is working:
@@ -48,10 +48,10 @@ In one of the workshop 7 goals you were asked to set up a Jenkins job for the ap
 > - The docs mention a "process-type". You want to use `web`
 > - If you are using `ENTRYPOINT dotnet run`, that will not work on Heroku because of how it runs containers. You can use the "exec" syntax instead: `ENTRYPOINT ["dotnet", "run"]`
 4. You should now see a log of the deployment on your Heroku app's dashboard: https://dashboard.heroku.com/apps/<HEROKU_APP_NAME> (replace <HEROKU_APP_NAME> with the name you gave your Heroku app when you created it).
-5. You can see the app running by clicking the "Open app" button on the app's dasboard, or by going to <HEROKU_APP_NAME>.herokuapp.com (replace <HEROKU_APP_NAME> with the name you gave your Heroku app when you created it).
+5. You can see the app running by clicking the "Open app" button on the app's dashboard, or by going to <HEROKU_APP_NAME>.herokuapp.com (replace <HEROKU_APP_NAME> with the name you gave your Heroku app when you created it).
 
 ### Multistage Dockerfile
-If you haven't already, try writing your Dockerfile as [a multistage build](https://docs.docker.com/engine/examples/dotnetcore/#create-a-dockerfile-for-an-aspnet-core-application). For an example that more closely matches this project see [here](https://github.com/dotnet/dotnet-docker/blob/main/samples/aspnetapp/Dockerfile)
+If you haven't already, try writing your Dockerfile as [a multistage build](https://docs.docker.com/samples/dotnetcore/#create-a-dockerfile-for-an-aspnet-core-application). For an example that more closely matches this project see [here](https://github.com/dotnet/dotnet-docker/blob/main/samples/aspnetapp/Dockerfile)
 ```
 FROM <parent-image-1> as build-stage
 # Some commands
@@ -65,7 +65,7 @@ To make the example work:
 - Replace any mention of "aspnetapp" with "DotnetTemplate.Web". 
 - In addition to copying DotnetTemplate.Web/\*.csproj, you will need to copy DotnetTemplate.Web.Tests/\*.csproj
 - Remove the "--no-restore" option from the publish command
-- Keep your instructions that install node, but you no longer need the "npm ..." commands (they are included in DotnetTemplate.Web.csproj). 
+- Keep your instructions that install node, but you no longer need the "npm ..." commands (they are included in DotnetTemplate.Web.csproj and run as part of `dotnet publish`).
 
 You should see a decrease in the image size from ~1.5GB to a few hundred MB. This will make uploads to Heroku a lot faster.
 
@@ -73,7 +73,7 @@ You should see a decrease in the image size from ~1.5GB to a few hundred MB. Thi
 Add a new step to your workflow which will deploy to Heroku. You should be able to find an existing action to do this for you. As with the publish step, make sure this only runs on the main branch.
 
 ### (Stretch goal) Healthcheck
-Sometimes the build, tests and deployment will all succeed, howevever the app won't actually run. In this case it can be useful if your workflow can tell you if this has happened. Modify your workflow so that it does a healthcheck.
+Sometimes the build, tests and deployment will all succeed, however the app won't actually run. In this case it can be useful if your workflow can tell you if this has happened. Modify your workflow so that it does a healthcheck.
 
 As part of this it can be useful to add a healthcheck endpoint to the app, see https://docs.microsoft.com/en-us/aspnet/core/host-and-deploy/health-checks?view=aspnetcore-5.0 for how to do this.
 
