@@ -2,7 +2,7 @@
 
 ## Part 1 (Publish to Docker Hub)
 
-### Add dockerfile
+### Add a Dockerfile
 Add a Dockerfile to the app so that you can build and run it using Docker.
 
 There are different approaches to writing the Dockerfile but we'd recommend starting from an [official dotnet image](https://hub.docker.com/_/microsoft-dotnet) and then [scripting the install of node/NPM](https://github.com/nodesource/distributions/blob/master/README.md).
@@ -17,9 +17,9 @@ And then add an `ENTRYPOINT` that will start the app.
 > - Note that you won't need to run `sudo` when building the image (as the default user is root).
 
 ### Publish manually to Docker Hub
-1. Create a personal free account on [Docker Hub](https://hub.docker.com/).
-2. Create a public repository in Docker Hub: https://hub.docker.com/repository/create. Don't connect it to GitHub and name it dotnettemplate.
-3. Build your docker image locally and push it to Docker Hub. See https://docs.docker.com/docker-hub/repos/ for instructions.
+1. Create a personal free account on [Docker Hub](https://hub.docker.com/) (if you haven't already).
+2. Create a public repository in Docker Hub: https://hub.docker.com/repository/create. Don't connect it to GitHub, and name it dotnettemplate.
+3. Build your Docker image locally and push it to Docker Hub. See https://docs.docker.com/docker-hub/repos/ for instructions.
 
 ### Publish to Docker Hub with GitHub Actions
 You should already have a GitHub Actions workflow file which will build and test the app. Now add a new step to it which will publish the app to Docker Hub. You should be able to find an existing action to do this for you.
@@ -87,7 +87,7 @@ Failures don't always happen immediately after a deployment. Sometimes runtime i
 Try making your workflow release to a different Heroku app environment for each branch of your repository.
 
 ### (Stretch goal) Promote when manually triggered
-Currently we'll deploy every time a change is pushed to the main branch. However you might want to have more control over when deployments happen. Modify your Heroku and workflow setup so your main branch releases to a staging environment you instead manually trigger a workflow to release to production. 
+Currently we'll deploy every time a change is pushed to the main branch. However you might want to have more control over when deployments happen. Modify your Heroku and workflow setup so your main branch releases to a staging environment, and you instead manually trigger a workflow to release to production. 
 
 ### (Stretch goal) Jenkins
 In one of the workshop 7 goals you were asked to set up a Jenkins job for the app (if you haven't done that yet it's worth going back to it now). Now modify the Jenkinsfile so that it will deploy to Heroku.
