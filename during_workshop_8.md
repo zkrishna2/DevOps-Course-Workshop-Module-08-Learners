@@ -15,6 +15,8 @@ And then add an `ENTRYPOINT` that will start the app.
 > - If you are seeing a Node Sass error, try adding the `DotnetTemplate.Web/node_modules` folder to a `.dockerignore` file to avoid copying local build artefacts/dependencies into the image.
 > - To build the dotnet code you'll need the correct version of the [SDK](mcr.microsoft.com/dotnet/sdk:5.0) (Software Development Kit) dotnet Docker image.
 > - Note that you won't need to run `sudo` when building the image (as the default user is root).
+> - Some instructions, like installing Node, might depend on the OS of an image - for a Linux image it might not be immediately obvious which distribution you have. Running the image and accessing a terminal can provide one approach to explore for an answer but Docker Hub might offer clues too - can you spot any on the dotnet SDK page?
+>   - For many images, starting the container with `docker run -it --entrypoint /bin/bash <image>` will give us access to a terminal, from where we can explore further. A command like `cat /etc/*-release` might provide us with an answer from there
 
 ### Publish manually to Docker Hub
 1. Create a personal free account on [Docker Hub](https://hub.docker.com/) (if you haven't already).
@@ -63,7 +65,6 @@ In this way you can use a large parent (`dotnet/sdk`) to build the app and then 
 
 To make the example work:
 - Replace any mention of "aspnetapp" with "DotnetTemplate.Web". 
-- In addition to copying DotnetTemplate.Web/\*.csproj, you will need to copy DotnetTemplate.Web.Tests/\*.csproj
 - Remove the "--no-restore" option from the publish command
 - Keep your instructions that install node, but you no longer need the "npm ..." commands (they are included in DotnetTemplate.Web.csproj and run as part of `dotnet publish`).
 
@@ -75,7 +76,7 @@ Add a new step to your workflow which will deploy to Heroku. You should be able 
 ### (Stretch goal) Healthcheck
 Sometimes the build, tests and deployment will all succeed, however the app won't actually run. In this case it can be useful if your workflow can tell you if this has happened. Modify your workflow so that it does a healthcheck.
 
-As part of this it can be useful to add a healthcheck endpoint to the app, see https://docs.microsoft.com/en-us/aspnet/core/host-and-deploy/health-checks?view=aspnetcore-5.0 for how to do this.
+As part of this it can be useful to add a healthcheck endpoint to the app, see [this microsoft guide](https://docs.microsoft.com/en-us/aspnet/core/host-and-deploy/health-checks?view=aspnetcore-5.0#basic-health-probe) for an example of how to do this. This article is long and detailed, and that can make it look intimidating - but everything we need to know is just in the "Basic health probe" section. Try working through it! You should find that we can add this healthcheck endpoint with just two lines of code.
 
 ### (Stretch goal) Handle failure
 How would you handle failure, for example if the healthcheck in the previous step fails? Write a custom action that will automatically roll-back a failed Heroku deployment. Make sure it sends an appropriate alert! Find a way to break your application and check this works.
