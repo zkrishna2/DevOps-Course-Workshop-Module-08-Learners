@@ -75,7 +75,7 @@ Add a new step to your workflow which will deploy to Heroku. You should be able 
 ### (Stretch goal) Healthcheck
 Sometimes the build, tests and deployment will all succeed, however the app won't actually run. In this case it can be useful if your workflow can tell you if this has happened. Modify your workflow so that it does a healthcheck.
 
-As part of this it can be useful to add a healthcheck endpoint to the app, see [this microsoft guide](https://docs.microsoft.com/en-us/aspnet/core/host-and-deploy/health-checks?view=aspnetcore-5.0#basic-health-probe) for an example of how to do this. This article looks intimidating, but can you work through the "Basic health probe" section? You should find that we can add the endpoint with just two lines of code.
+As part of this it can be useful to add a healthcheck endpoint to the app, see [this microsoft guide](https://docs.microsoft.com/en-us/aspnet/core/host-and-deploy/health-checks?view=aspnetcore-5.0#basic-health-probe) for an example of how to do this. This article is long and detailed, and that can make it look intimidating - but everything we need to know is just in the "Basic health probe" section. Try working through it! You should find that we can add this healthcheck endpoint with just two lines of code.
 
 ### (Stretch goal) Handle failure
 How would you handle failure, for example if the healthcheck in the previous step fails? Write a custom action that will automatically roll-back a failed Heroku deployment. Make sure it sends an appropriate alert! Find a way to break your application and check this works.
