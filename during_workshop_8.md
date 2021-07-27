@@ -15,7 +15,8 @@ And then add an `ENTRYPOINT` that will start the app.
 > - If you are seeing a Node Sass error, try adding the `DotnetTemplate.Web/node_modules` folder to a `.dockerignore` file to avoid copying local build artefacts/dependencies into the image.
 > - To build the dotnet code you'll need the correct version of the [SDK](mcr.microsoft.com/dotnet/sdk:5.0) (Software Development Kit) dotnet Docker image.
 > - Note that you won't need to run `sudo` when building the image (as the default user is root).
-> - Some instructions, like installing Node, might depend on the OS of an image - for a Linux image it might not be immediately obvious which distribution you have. Interacting with a container built from the image can often help you to determine it (e.g. `cat /etc/*-release` will often provide an idea) but Docker Hub might offer clues too - can you spot any on the dotnet SDK page?
+> - Some instructions, like installing Node, might depend on the OS of an image - for a Linux image it might not be immediately obvious which distribution you have. Running the image and accessing a terminal can provide one approach to explore for an answer but Docker Hub might offer clues too - can you spot any on the dotnet SDK page?
+>   - For many images, starting the container with `docker run -it --entrypoint /bin/bash <image>` will give us access to a terminal, from where we can explore further. A command like `cat /etc/*-release` might provide us with an answer from there
 
 ### Publish manually to Docker Hub
 1. Create a personal free account on [Docker Hub](https://hub.docker.com/) (if you haven't already).
