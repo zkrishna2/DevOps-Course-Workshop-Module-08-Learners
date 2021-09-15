@@ -52,6 +52,21 @@ In one of the workshop 7 goals you were asked to set up a Jenkins job for the ap
 4. You should now see a log of the deployment on your Heroku app's dashboard: https://dashboard.heroku.com/apps/<HEROKU_APP_NAME> (replace <HEROKU_APP_NAME> with the name you gave your Heroku app when you created it).
 5. You can see the app running by clicking the "Open app" button on the app's dashboard, or by going to <HEROKU_APP_NAME>.herokuapp.com (replace <HEROKU_APP_NAME> with the name you gave your Heroku app when you created it).
 
+### Deploy to Heroku with GitHub Actions
+Add a new step to your workflow which will deploy to Heroku. You should be able to find an existing action to do this for you. As with the publish step, make sure this only runs on the main branch.
+
+<details>
+<summary>Hint</summary>
+
+You might want to look [at this action](https://github.com/marketplace/actions/deploy-to-heroku).
+
+<details>
+<summary>Hint</summary>
+
+See the example ["Deploy with Docker"](https://github.com/marketplace/actions/deploy-to-heroku#deploy-with-docker) section, and don't forget the `useddocker` flag
+</details>
+</details>
+
 ### Multistage Dockerfile
 If you haven't already, try writing your Dockerfile as [a multistage build](https://docs.docker.com/samples/dotnetcore/#create-a-dockerfile-for-an-aspnet-core-application). For an example that more closely matches this project see [here](https://github.com/dotnet/dotnet-docker/blob/main/samples/aspnetapp/Dockerfile)
 ```
@@ -69,9 +84,6 @@ To make the example work:
 - Keep your instructions that install node, but you no longer need the "npm ..." commands (they are included in DotnetTemplate.Web.csproj and run as part of `dotnet publish`).
 
 You should see a decrease in the image size from ~1.5GB to a few hundred MB. This will make uploads to Heroku a lot faster.
-
-### Deploy to Heroku with GitHub Actions
-Add a new step to your workflow which will deploy to Heroku. You should be able to find an existing action to do this for you. As with the publish step, make sure this only runs on the main branch.
 
 ### (Stretch goal) Healthcheck
 Sometimes the build, tests and deployment will all succeed, however the app won't actually run. In this case it can be useful if your workflow can tell you if this has happened. Modify your workflow so that it does a healthcheck.
