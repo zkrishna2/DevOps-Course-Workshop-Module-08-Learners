@@ -53,25 +53,36 @@ In one of the workshop 7 goals you were asked to set up a Jenkins job for the ap
 5. You can see the app running by clicking the "Open app" button on the app's dashboard, or by going to <HEROKU_APP_NAME>.herokuapp.com (replace <HEROKU_APP_NAME> with the name you gave your Heroku app when you created it).
 
 ### Multistage Dockerfile
-If you haven't already, try writing your Dockerfile as [a multistage build](https://docs.docker.com/samples/dotnetcore/#create-a-dockerfile-for-an-aspnet-core-application). For an example that more closely matches this project see [here](https://github.com/dotnet/dotnet-docker/blob/main/samples/aspnetapp/Dockerfile)
-```
+If you haven't already, try writing your Dockerfile as [a multistage build](https://docs.docker.com/samples/dotnetcore/#create-a-dockerfile-for-an-aspnet-core-application). This can decrease in the image size from ~1.5GB to a few hundred MB by only limiting the final image to what's strictly necessary. This will make uploads to Heroku a lot faster.
+
+The structure of your Dockerfile will look like this:
+```dockerfile
 FROM <parent-image-1> as build-stage
 # Some commands
 
 FROM <parent-image-2>
 # Some commands
 ```
-In this way you can use a large parent (`dotnet/sdk`) to build the app and then use a smaller parent (`dotnet/aspnet`) for your final image that will run the application. The second stage just needs to copy the build artefact from the earlier stage with a COPY command of the form: `COPY --from=build-stage ./source ./destination`.
+
+In this way you use a large parent (`dotnet/sdk`) to build the app and then use a smaller parent (`dotnet/aspnet`) for your final image that will run the application. The second stage just needs to copy the build artefact from the earlier stage with a COPY command of the form: `COPY --from=build-stage ./source ./destination`.
+
+For an example that more closely matches this project, see [here](https://github.com/dotnet/dotnet-docker/blob/main/samples/aspnetapp/Dockerfile).
 
 To make the example work:
 - Replace any mention of "aspnetapp" with "DotnetTemplate.Web". 
 - Remove the "--no-restore" option from the publish command
 - Keep your instructions that install node, but you no longer need the "npm ..." commands (they are included in DotnetTemplate.Web.csproj and run as part of `dotnet publish`).
 
-You should see a decrease in the image size from ~1.5GB to a few hundred MB. This will make uploads to Heroku a lot faster.
-
 ### Deploy to Heroku with GitHub Actions
-Add a new step to your workflow which will deploy to Heroku. You should be able to find an existing action to do this for you. As with the publish step, make sure this only runs on the main branch.
+Add a new step to your workflow which will deploy to Heroku. You should be able to find an existing action in the [Marketplace](https://github.com/marketplace) to do this for you. As with the publish step, make sure this only runs on the main branch.
+
+<details><summary>Hint</summary>
+
+You could use [this action](https://github.com/marketplace/actions/deploy-to-heroku) if you set the `usedocker` option to true, and pass in the other required fields like a Heroku API key. 
+
+</details>
+
+<br/>
 
 ### (Stretch goal) Healthcheck
 Sometimes the build, tests and deployment will all succeed, however the app won't actually run. In this case it can be useful if your workflow can tell you if this has happened. Modify your workflow so that it does a healthcheck.
