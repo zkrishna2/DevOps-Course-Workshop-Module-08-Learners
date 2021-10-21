@@ -52,11 +52,27 @@ In one of the workshop 7 goals you were asked to set up a Jenkins job for the ap
 4. You should now see a log of the deployment on your Heroku app's dashboard: https://dashboard.heroku.com/apps/<HEROKU_APP_NAME> (replace <HEROKU_APP_NAME> with the name you gave your Heroku app when you created it).
 5. You can see the app running by clicking the "Open app" button on the app's dashboard, or by going to <HEROKU_APP_NAME>.herokuapp.com (replace <HEROKU_APP_NAME> with the name you gave your Heroku app when you created it).
 
-### Multistage Dockerfile
-If you haven't already, try writing your Dockerfile as [a multistage build](https://docs.docker.com/samples/dotnetcore/#create-a-dockerfile-for-an-aspnet-core-application). This can decrease in the image size from ~1.5GB to a few hundred MB by only limiting the final image to what's strictly necessary. This will make uploads to Heroku a lot faster.
+### Deploy to Heroku with GitHub Actions
+Add a new step to your workflow which will deploy to Heroku. You should be able to find an existing action to do this for you. As with the publish step, make sure this only runs on the main branch.
 
-The structure of your Dockerfile will look like this:
-```dockerfile
+<details>
+<summary>Hint</summary>
+
+You might want to look [at this action](https://github.com/marketplace/actions/deploy-to-heroku).
+
+<details>
+<summary>Hint</summary>
+
+See the example ["Deploy with Docker"](https://github.com/marketplace/actions/deploy-to-heroku#deploy-with-docker) section, and don't forget the `usedocker` flag
+</details>
+</details>
+
+###  (Stretch goal) Multistage Dockerfile
+You may have noticed that the image our Dockerfile builds is pretty sizeable (~1.5GB) and, apart from taking up space, it slows our pipeline down during the upload step. .NET allows us to separate the dependencies needed to build the code (part of the SDK) from those needed to run the compiled binary (the runtime), with the latter being much smaller. This offers a good opportunity to optimise the speed of our deployment pipeline.
+
+Try writing your Dockerfile as a multistage build. The structure of your Dockerfile will look like this:
+
+```docker
 FROM <parent-image-1> as build-stage
 # Some commands
 
@@ -66,23 +82,16 @@ FROM <parent-image-2>
 
 In this way you use a large parent (`dotnet/sdk`) to build the app and then use a smaller parent (`dotnet/aspnet`) for your final image that will run the application. The second stage just needs to copy the build artefact from the earlier stage with a COPY command of the form: `COPY --from=build-stage ./source ./destination`.
 
-For an example that more closely matches this project, see [here](https://github.com/dotnet/dotnet-docker/blob/main/samples/aspnetapp/Dockerfile).
+For [an example that closely matches this project see here](https://github.com/dotnet/dotnet-docker/blob/main/samples/aspnetapp/Dockerfile) - or [see the Docker docs](https://docs.docker.com/samples/dotnetcore/#create-a-dockerfile-for-an-aspnet-core-application) for another approach.
 
-To make the example work:
+
+To make the first example linked above work:
 - Replace any mention of "aspnetapp" with "DotnetTemplate.Web". 
+- Remove the `dotnet restore` line
 - Remove the "--no-restore" option from the publish command
 - Keep your instructions that install node, but you no longer need the "npm ..." commands (they are included in DotnetTemplate.Web.csproj and run as part of `dotnet publish`).
 
-### Deploy to Heroku with GitHub Actions
-Add a new step to your workflow which will deploy to Heroku. You should be able to find an existing action in the [Marketplace](https://github.com/marketplace) to do this for you. As with the publish step, make sure this only runs on the main branch.
-
-<details><summary>Hint</summary>
-
-You could use [this action](https://github.com/marketplace/actions/deploy-to-heroku) if you set the `usedocker` option to true, and pass in the other required fields like a Heroku API key. 
-
-</details>
-
-<br/>
+Check that you can still run the app locally using your new image, and then push your changes. You should see a decrease in the image size locally from ~1.5GB to a few hundred MB - does your pipeline speed up?
 
 ### (Stretch goal) Healthcheck
 Sometimes the build, tests and deployment will all succeed, however the app won't actually run. In this case it can be useful if your workflow can tell you if this has happened. Modify your workflow so that it does a healthcheck.
