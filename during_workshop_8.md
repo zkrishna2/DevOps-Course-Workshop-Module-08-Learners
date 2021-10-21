@@ -7,9 +7,9 @@ Add a Dockerfile to the app so that you can build and run it using Docker.
 
 There are different approaches to writing the Dockerfile but we'd recommend starting from an [official dotnet image](https://hub.docker.com/_/microsoft-dotnet) and then [scripting the install of node/NPM](https://github.com/nodesource/distributions/blob/master/README.md).
 
-Then use the setup commands in [during_workshop_7.md](./during_workshop_7.md) to install dependencies and build the app.
+Then use the setup commands in [during_workshop_7.md](./during_workshop_7.md) to install dependencies and build the app, and add an `ENTRYPOINT` that will start the app.
 
-And then add an `ENTRYPOINT` that will start the app.
+Once you've done that try building and running the Dockerfile locally to check it works.
 
 > Troubleshooting:
 > - If you are seeing a Node Sass error, try adding the `DotnetTemplate.Web/node_modules` folder to a `.dockerignore` file to avoid copying local build artefacts/dependencies into the image.
