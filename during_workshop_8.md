@@ -63,15 +63,15 @@ You might want to look [at this action](https://github.com/marketplace/actions/d
 <details>
 <summary>Hint</summary>
 
-See the example ["Deploy with Docker"](https://github.com/marketplace/actions/deploy-to-heroku#deploy-with-docker) section, and don't forget the `useddocker` flag
+See the example ["Deploy with Docker"](https://github.com/marketplace/actions/deploy-to-heroku#deploy-with-docker) section, and don't forget the `usedocker` flag
 </details>
 </details>
 
 ###  (Stretch goal) Multistage Dockerfile
-You may have noticed that our Dockerfile is pretty sizeable (~1.5GB) and apart from taking up space, it also slows our pipeline down as the upload step tends to take a while. .NET allows us to separate the dependencies we need for building the code to those that we need for running the compiled binary with the latter being quite a bit smaller. This offers a good opportunity here to optimise the speed of our deployment pipeline.
+You may have noticed that the image our Dockerfile builds is pretty sizeable (~1.5GB) and, apart from taking up space, it slows our pipeline down during the upload step. .NET allows us to separate the dependencies needed to build the code (part of the SDK) from those needed to run the compiled binary (the runtime), with the latter being much smaller. This offers a good opportunity to optimise the speed of our deployment pipeline.
 
 
-Try writing your Dockerfile as a multistage build. For [an example that closely matches this project see here](https://github.com/dotnet/dotnet-docker/blob/main/samples/aspnetapp/Dockerfile) - or [see the Docker docs](](https://docs.docker.com/samples/dotnetcore/#create-a-dockerfile-for-an-aspnet-core-application)) for another approach.
+Try writing your Dockerfile as a multistage build. For [an example that closely matches this project see here](https://github.com/dotnet/dotnet-docker/blob/main/samples/aspnetapp/Dockerfile) - or [see the Docker docs](https://docs.docker.com/samples/dotnetcore/#create-a-dockerfile-for-an-aspnet-core-application) for another approach.
 ```
 FROM <parent-image-1> as build-stage
 # Some commands
@@ -81,7 +81,7 @@ FROM <parent-image-2>
 ```
 In this way you can use a large parent (`dotnet/sdk`) to build the app and then use a smaller parent (`dotnet/aspnet`) for your final image that will run the application. The second stage just needs to copy the build artefact from the earlier stage with a COPY command of the form: `COPY --from=build-stage ./source ./destination`.
 
-To make the example work:
+To make the first example linked above work:
 - Replace any mention of "aspnetapp" with "DotnetTemplate.Web". 
 - Remove the `dotnet restore` line
 - Remove the "--no-restore" option from the publish command
