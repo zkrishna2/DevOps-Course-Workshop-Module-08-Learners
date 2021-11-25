@@ -11,4 +11,4 @@ WORKDIR /MyApp/DotnetTemplate.Web/
 RUN npm install
 RUN npm run build
 
-CMD [ "dotnet", "run" ]
+ENTRYPOINT [ "dotnet", "run" ]
